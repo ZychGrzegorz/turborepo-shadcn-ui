@@ -6,10 +6,10 @@ export default function Unrouted() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push('/'); // Redirect to the main page
-    }, 3000); // 3 seconds
+      router.push('/');
+    }, 3000); 
 
-    return () => clearTimeout(timer); // Cleanup the timer on unmount
+    return () => clearTimeout(timer);
   }, [router]);
 
   return (
