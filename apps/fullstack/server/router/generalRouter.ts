@@ -1,27 +1,37 @@
 import { z } from "zod";
 import { SwaggerTags } from "../swagger/swagger-tags";
 import { publicProcedure, router } from "../trpc";
-import { getGeneralService } from "../services/general";
 import { getServices } from "../services";
+import { generalSchema } from "../schemas/general";
 
+const path = "/api/general";
 
 export const GeneralRouter = router({
     main: publicProcedure
-        // .meta({
-        //     openapi: {
-        //         method: "GET",
-        //         path: `general/get`,
-        //         tags: [SwaggerTags.general],
-        //     },
-        // })
-        // .input(z.void())
-        .input(z.any())
-        // .output(z.any())
-        // .output(z.object({ name: z.string() }))
-        .query(async ({input}) => {
-            // const allResults = (await getGeneralService()).list({});
+        .meta({
+            openapi: {
+                method: 'GET', path: `${path}/getMain`,
+                tags: [SwaggerTags.general],
+            }
+        })
+        .input(z.object({ name: z.string() }))
+        .output(generalSchema)
+        .query(async ({ input: { name } }) => {
             const { generalService } = await getServices();
-            const allResults = await generalService.list(input.query);
-            return { allResults }
+            const allResults = await generalService.list({ name });
+            return generalSchema.parse(allResults);
+        }),
+    sayHello: publicProcedure
+        .meta({
+            openapi: { method: 'GET', path: '/say-hello' }
+        })
+        .input(z.object({
+            name: z.string()
+        }))
+        .output(z.object({
+            greeting: z.string()
+        }))
+        .query(({ input }) => {
+            return { greeting: `Hello ${input.name}!` }
         })
 })
